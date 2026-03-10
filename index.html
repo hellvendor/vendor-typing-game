@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>의류벤더 용어 타자 연습</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: linear-gradient(180deg, #eef4ff 0%, #f8fafc 100%);
+    color: #0f172a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .app {
+    width: 1080px;
+    max-width: 100%;
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid #dbe4f0;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.16);
+  }
+  .header {
+    background: #0f172a;
+    color: white;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .title-wrap h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.2;
+  }
+  .title-wrap p {
+    margin: 6px 0 0;
+    color: #cbd5e1;
+    font-size: 14px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(88px, 1fr));
+    gap: 10px;
+    width: min(100%, 640px);
+  }
+  .stat {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 10px 12px;
+  }
+  .stat .label {
+    display: block;
+    font-size: 12px;
+    color: #cbd5e1;
+    margin-bottom: 2px;
+  }
+  .stat .value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .content {
+    padding: 20px 24px 24px;
+  }
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 140px 140px 140px;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  input, select, button {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 14px;
+    font-size: 16px;
+    border: 1px solid #cbd5e1;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  }
+  button {
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #1d4ed8;
+  }
+  .secondary {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+  .secondary:hover {
+    background: #cbd5e1;
+  }
+  .game-area {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+    border-radius: 20px;
+    border: 2px solid #dbeafe;
+    background:
+      radial-gradient(circle at top, rgba(191,219,254,0.65), rgba(255,255,255,0) 35%),
+      linear-gradient(180deg, #f8fbff 0%, #eff6ff 100%);
+  }
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(to bottom, rgba(15,23,42,0.04) 1px, transparent 1px);
+    background-size: 100% 46px;
+    pointer-events: none;
+  }
+  .danger-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 64px;
+    border-top: 3px dashed #ef4444;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+    background: #fee2e2;
+    border-top: 2px solid #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #991b1b;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .word {
+    position: absolute;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: #111827;
+    color: white;
+    font-weight: 700;
+    white-space: nowrap;
+    user-select: none;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.24);
+    z-index: 2;
+  }
+  .message {
+    min-height: 26px;
+    margin-top: 12px;
+    font-size: 15px;
+    color: #334155;
+  }
+  .footer-note {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.84);
+    backdrop-filter: blur(2px);
+    padding: 24px;
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .overlay-card {
+    background: white;
+    max-width: 520px;
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 14px 34px rgba(15,23,42,0.15);
+  }
+  .overlay-card h2 {
+    margin: 0 0 10px;
+    font-size: 28px;
+  }
+  .overlay-card p {
+    margin: 8px 0;
+    line-height: 1.55;
+  }
+  .ending-text {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 16px 0 !important;
+  }
+  @media (max-width: 900px) {
+    .controls {
+      grid-template-columns: 1fr 1fr;
+    }
+    .stats {
+      grid-template-columns: repeat(3, minmax(88px, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .controls {
+      grid-template-columns: 1fr;
+    }
+    .stats {
+      grid-template-columns: repeat(2, minmax(88px, 1fr));
+    }
+    .header {
+      padding: 18px;
+    }
+    .content {
+      padding: 16px;
+    }
+    .game-area {
+      height: 520px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="title-wrap">
+      <h1>의류벤더 용어 타자 연습</h1>
+      <p>의류 OEM 벤더 실무 용어 연습용 · 1000개 이상 단어 풀 · 레벨/속도 증가 · 엔딩 시스템</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="label">점수</span><span class="value" id="score">0</span></div>
+      <div class="stat"><span class="label">목숨</span><span class="value" id="lives">5</span></div>
+      <div class="stat"><span class="label">성공</span><span class="value" id="cleared">0</span></div>
+      <div class="stat"><span class="label">레벨</span><span class="value" id="level">1</span></div>
+      <div class="stat"><span class="label">최고점수</span><span class="value" id="highScore">0</span></div>
+      <div class="stat"><span class="label">단어 수</span><span class="value" id="wordCount">0</span></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="controls">
+      <input id="typingInput" type="text" placeholder="떨어지는 단어를 입력하고 Enter를 누르세요" autocomplete="off" />
+      <select id="difficulty">
+        <option value="easy">쉬움</option>
+        <option value="normal" selected>보통</option>
+        <option value="hard">어려움</option>
+      </select>
+      <button id="startBtn" type="button">시작 / 다시시작</button>
+      <button id="pauseBtn" type="button" class="secondary">일시정지</button>
+    </div>
+
+    <div class="game-area" id="gameArea">
+      <div class="grid-lines"></div>
+      <div class="danger-line"></div>
+      <div class="floor">여기까지 내려오면 목숨이 줄어듭니다</div>
+      <div class="overlay" id="overlay">
+        <div class="overlay-card">
+          <h2>게임 준비</h2>
+          <p>시작 버튼을 누르면 의류 벤더 용어가 위에서 떨어집니다.</p>
+          <p>정확히 입력하고 <b>Enter</b>를 누르면 제거됩니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="message" id="message"></div>
+    <div class="footer-note">
+      점수가 오를수록 레벨이 올라가고 단어가 더 자주, 더 빠르게 떨어집니다. 게임 종료 시 점수에 따라 현실적인 배드 엔딩 또는 칭찬형 굿 엔딩이 랜덤으로 표시됩니다.
+    </div>
+  </div>
+</div>
+
+<script>
+  function buildWordPool() {
+    const singles = [
+      "요척","미니마카","효율","사전원가","사후원가","스타일넘버","베트남","인도네시아","과테말라","아이티","공장","라인","생산라인","라인밸런싱","라인효율","생산계획","생산스케줄","목표생산량","실제생산량","리드타임","생산관리","생산공정","생산지시","현장관리","오더","발주","오더수량","오더변경","납기","출하","선적","생산회의","긴급오더","추가오더","반복오더","바이어","벤더","거래선","협력업체","하청공장",
+      "fabric","원단","니트","우븐","데님","저지","리브","인터록","플리스","메쉬","트윌","캔버스","포플린","옥스포드","새틴","쉬폰","스판덱스","폴리에스터","코튼","나일론","레이온","비스코스","린넨","테리","프렌치테리","기모","싱글저지","더블니트","립조직","체크","스트라이프","프린트","염색","후가공","가공원단","원단롤","원단폭","원단중량","원단길이","원단불량","원단오염","원단검사","원단테스트","컬러승인",
+      "width","weight","length","gsm","밀도","수축률","색상견뢰도","마찰견뢰도","일광견뢰도","세탁견뢰도","필링","비침","터치감","두께","조도","강도","인장강도","복원력","탄성","혼용률","중량","폭","길이","색상차이","랩딥","세탁변형","꼬임","비틀림","편차","허용오차",
+      "pattern","패턴","패턴제작","패턴수정","그레이딩","마카","미니마카","마카효율","패턴마킹","패턴레이아웃","사이즈셋","치수","치수표","실측","실측오차","시접","재단선","재단패턴","패턴승인","패턴검토","샘플패턴","양산패턴","부자재배치","자수위치","프린트위치","포켓위치","네크라인","암홀","밑단","소매장","총장","허리","엉덩이","허벅지","밑위",
+      "sample","샘플","프로토샘플","핏샘플","세일즈샘플","출하샘플","승인샘플","개발샘플","사이즈셋샘플","PP샘플","TOP샘플","SMS","테스트샘플","골든샘플","코멘트반영","수정샘플","샘플요청","샘플검토","샘플반려","샘플승인","바이어코멘트","착장테스트","피팅","피팅코멘트",
+      "inspection","검사","인라인검사","최종검사","AQL검사","품질관리","품질이슈","품질보고","품질클레임","불량률","불량","치수불량","외관불량","오염불량","봉제불량","재단불량","원단불량","리워크","리페어","니들체크","금속검출","금속검사","세탁테스트","수축테스트","견뢰도테스트","인장테스트","박음질강도","검침","재검사","샘플검사","출하검사","불량분석","원인분석","시정조치","예방조치",
+      "cutting","재단","재단실","재단마카","연단","연단작업","자동재단","수동재단","재단오차","번들링","번들카드","봉제","오버록","플랫락","본봉","인터록봉제","바택","단추부착","단추구멍","지퍼부착","라벨부착","케어라벨","메인라벨","사이즈라벨","프린트","자수","워싱","마감","다림질","프레싱","접기","폴리백","카톤포장","행택","박스라벨","출하준비",
+      "shipment","선적서류","부킹","컨테이너","선적일","출항일","도착일","패킹리스트","상업송장","인보이스","PL","BL","CO","수출서류","선적마감","선적지연","납기지연","입고","출고","재고","자재입고","원부자재","부자재","트림","지퍼","단추","심지","고무밴드","코드","스토퍼","벨크로","스냅","행거","카톤","폴리백","실사","라벨승인","바코드",
+      "ERP","SCM","MES","PLM","WMS","생산시스템","재고시스템","자재관리","주문관리","생산추적","현황판","원가계산","목표원가","원가분석","원가절감","CM원가","CMT원가","원단원가","노무비","간접비","제조원가","운임","통관비","마진","판매가","견적","단가협상","가공비","수율","손실률","불량코스트","생산성","생산실적","라인투입","투입량","완성수량"
+    ];
+
+    const prefixesKo = ["긴급","최종","초기","중간","양산","사전","사후","예상","실제","표준","목표","반복","주간","월간","일일","메인","서브","현장","내부","외부","핵심","기본","상세","자동","수동"];
+    const basesKo = ["원가","효율","생산계획","생산스케줄","생산관리","생산공정","생산지시","출하계획","출하일정","원단검사","원단오염","원단불량","치수검사","품질관리","품질보고","리워크","재작업","마카효율","라인효율","라인밸런싱","납기관리","자재관리","재고관리","오더관리","패턴수정","샘플검토","바이어코멘트","출하검사","선적서류","납기지연","부킹확인","컨테이너예약","원부자재입고","부자재확인","봉제불량","재단오차","검사결과","시정조치","예방조치"];
+    const prefixesEn = ["pre","post","target","actual","daily","weekly","monthly","final","inline","endline","bulk","sample","main","sub","auto","manual","urgent","standard","basic","detailed","buyer","factory","fabric","quality","shipment"];
+    const basesEn = ["costing","efficiency","production plan","production schedule","production report","line efficiency","line balancing","material control","inventory control","quality control","inline inspection","final inspection","fabric inspection","shipment plan","shipment schedule","booking status","container plan","sample review","buyer comment","pattern revision","marker efficiency","lead time","delivery plan","delivery schedule","rework plan","repair status","defect analysis","aql inspection","washing test","shrinkage test","fabric defect","cutting issue","sewing issue","packing status","approval status","sample approval","trim status","fabric status","order status","factory update"];
+
+    const pool = new Set();
+    singles.forEach(w => pool.add(w));
+    prefixesKo.forEach(p => basesKo.forEach(b => pool.add(`${p}${b}`)));
+    prefixesEn.forEach(p => basesEn.forEach(b => pool.add(`${p} ${b}`)));
+
+    return Array.from(pool);
+  }
+
+  const WORDS = buildWordPool();
+
+  const BAD_ENDINGS = [
+    "당신의 진급이 누락되었습니다",
+    "아이티로 파견이 결정되었습니다",
+    "과테말라로 출장이 결정되었습니다",
+    "파견이 1년 연장되었습니다",
+    "원단에서 심각한 오염이 발견되었습니다",
+    "바이어가 샘플에서 잘못된 부분을 발견하였습니다",
+    "바이어가 긴급 미팅을 요청했습니다",
+    "생산이 3일 지연되었습니다",
+    "PP 샘플이 반려되었습니다",
+    "원단 검사에서 불합격이 발생했습니다",
+    "바이어가 납기 단축을 요청했습니다",
+    "생산라인 효율이 급격히 떨어졌습니다",
+    "마카 효율이 기준보다 낮습니다",
+    "재단 오류가 발견되었습니다",
+    "봉제 불량률이 증가했습니다",
+    "검사에서 치수 오류가 발견되었습니다",
+    "라인 밸런싱이 무너졌습니다",
+    "납기일을 맞추기 어렵습니다",
+    "생산 수량이 목표에 미달했습니다",
+    "추가 야근이 결정되었습니다",
+    "바이어가 가격 인하를 요구했습니다",
+    "샘플 수정 요청이 접수되었습니다",
+    "생산 계획이 변경되었습니다",
+    "원단 납기가 지연되었습니다",
+    "컨테이너 예약이 취소되었습니다",
+    "출하 일정이 변경되었습니다",
+    "품질 클레임이 접수되었습니다",
+    "바이어가 긴급 리포트를 요청했습니다",
+    "공장에서 긴급 연락이 왔습니다",
+    "생산 중단 이슈가 발생했습니다",
+    "검사에서 AQL 불합격이 발생했습니다",
+    "샘플 승인 지연이 발생했습니다",
+    "원단 재주문이 필요합니다",
+    "긴급 재샘플 요청이 들어왔습니다",
+    "봉제 라인이 멈췄습니다",
+    "재단 오류로 재작업이 필요합니다",
+    "생산 라인에 병목이 발생했습니다",
+    "납기 압박이 시작되었습니다",
+    "바이어가 납기 확인 메일을 보냈습니다",
+    "긴급 회의가 소집되었습니다",
+    "생산 수율이 떨어지고 있습니다",
+    "품질 이슈 보고가 접수되었습니다",
+    "원단 롤에서 결점이 발견되었습니다",
+    "생산 목표가 상향되었습니다",
+    "추가 생산이 요청되었습니다",
+    "출하 전 검사가 강화되었습니다",
+    "긴급 생산 일정이 잡혔습니다",
+    "생산팀에서 도움을 요청했습니다",
+    "바이어가 현장 방문을 예고했습니다",
+    "긴급 상황 보고서를 작성해야 합니다"
+  ];
+
+  const GOOD_ENDINGS = [
+    "바이어가 당신의 대응을 높게 평가했습니다",
+    "생산 라인이 안정적으로 운영되었습니다",
+    "샘플이 한 번에 승인되었습니다",
+    "마카 효율이 목표치를 초과했습니다",
+    "바이어가 추가 오더를 요청했습니다",
+    "공장이 당신의 관리 능력을 칭찬했습니다",
+    "납기를 완벽하게 맞췄습니다",
+    "품질 검사에서 전량 합격했습니다",
+    "라인 효율이 최고 기록을 달성했습니다",
+    "당신의 보고서가 모범 사례로 공유되었습니다"
+  ];
+
+  const SETTINGS = {
+    easy: { spawn: 1500, smin: 0.35, smax: 0.75 },
+    normal: { spawn: 1100, smin: 0.55, smax: 1.0 },
+    hard: { spawn: 800, smin: 0.85, smax: 1.35 }
+  };
+
+  const gameArea = document.getElementById('gameArea');
+  const input = document.getElementById('typingInput');
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const difficulty = document.getElementById('difficulty');
+  const scoreEl = document.getElementById('score');
+  const livesEl = document.getElementById('lives');
+  const clearedEl = document.getElementById('cleared');
+  const levelEl = document.getElementById('level');
+  const highScoreEl = document.getElementById('highScore');
+  const wordCountEl = document.getElementById('wordCount');
+  const overlay = document.getElementById('overlay');
+  const messageEl = document.getElementById('message');
+
+  wordCountEl.textContent = WORDS.length;
+
+  let words = [];
+  let score = 0;
+  let lives = 5;
+  let cleared = 0;
+  let running = false;
+  let paused = false;
+  let last = 0;
+  let spawnTimer = 0;
+  let anim = null;
+
+  let highScore = Number(localStorage.getItem('vendor_typing_highscore') || 0);
+  highScoreEl.textContent = highScore;
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+  function pick() { return WORDS[Math.floor(Math.random() * WORDS.length)]; }
+  function getLevel() { return Math.floor(score / 100) + 1; }
+
+  function updateStats() {
+    scoreEl.textContent = score;
+    livesEl.textContent = lives;
+    clearedEl.textContent = cleared;
+    levelEl.textContent = getLevel();
+  }
+
+  function msg(t) { messageEl.textContent = t; }
+
+  function createWord() {
+    const text = pick();
+    const el = document.createElement('div');
+    el.className = 'word';
+    el.textContent = text;
+    gameArea.appendChild(el);
+
+    const maxLeft = Math.max(20, gameArea.clientWidth - el.offsetWidth - 20);
+    const speedMultiplier = 1 + (getLevel() - 1) * 0.15;
+
+    const item = {
+      text,
+      x: rand(10, maxLeft),
+      y: 10,
+      speed: rand(SETTINGS[difficulty.value].smin, SETTINGS[difficulty.value].smax) * speedMultiplier,
+      el
+    };
+
+    el.style.left = item.x + 'px';
+    el.style.top = item.y + 'px';
+    words.push(item);
+  }
+
+  function removeWord(w) {
+    w.el.remove();
+    words = words.filter(x => x !== w);
+  }
+
+  function normalize(t) { return t.trim().toLowerCase(); }
+
+  function handle() {
+    if (!running || paused) return;
+    const typed = normalize(input.value);
+    if (!typed) return;
+
+    const match = words.find(w => normalize(w.text) === typed);
+
+    if (match) {
+      removeWord(match);
+      score += 10;
+      cleared++;
+      updateStats();
+      msg(`정답: ${match.text}`);
+    } else {
+      msg('일치 단어 없음');
+    }
+
+    input.value = '';
+  }
+
+  function pickEnding() {
+    if (score >= 300) {
+      return GOOD_ENDINGS[Math.floor(Math.random() * GOOD_ENDINGS.length)];
+    }
+    return BAD_ENDINGS[Math.floor(Math.random() * BAD_ENDINGS.length)];
+  }
+
+  function gameOver() {
+    running = false;
+    paused = false;
+    pauseBtn.textContent = '일시정지';
+
+    if (anim) cancelAnimationFrame(anim);
+
+    if (score > highScore) {
+      highScore = score;
+      localStorage.setItem('vendor_typing_highscore', highScore);
+      highScoreEl.textContent = highScore;
+    }
+
+    const ending = pickEnding();
+
+    overlay.style.display = 'flex';
+    overlay.innerHTML = `
+      <div class="overlay-card">
+        <h2>게임 종료</h2>
+        <p class="ending-text">${ending}</p>
+        <p>점수 ${score}</p>
+        <p>레벨 ${getLevel()}</p>
+        <p>다시 하려면 시작 / 다시시작 버튼을 누르세요.</p>
+      </div>`;
+  }
+
+  function reset() {
+    words.forEach(w => w.el.remove());
+    words = [];
+    score = 0;
+    lives = 5;
+    cleared = 0;
+    spawnTimer = 0;
+    last = 0;
+    paused = false;
+
+    updateStats();
+    msg('');
+    pauseBtn.textContent = '일시정지';
+
+    overlay.style.display = 'none';
+    overlay.innerHTML = '';
+  }
+
+  function loop(t) {
+    if (!running || paused) return;
+
+    if (!last) last = t;
+    const delta = t - last;
+    last = t;
+
+    spawnTimer += delta;
+
+    const set = SETTINGS[difficulty.value];
+    const spawnDelay = set.spawn / (1 + (getLevel() - 1) * 0.1);
+
+    if (spawnTimer > spawnDelay) {
+      createWord();
+      spawnTimer = 0;
+    }
+
+    const floor = gameArea.clientHeight - 64;
+
+    for (const w of [...words]) {
+      w.y += w.speed * (delta / 16);
+      w.el.style.top = w.y + 'px';
+
+      if (w.y + w.el.offsetHeight >= floor) {
+        removeWord(w);
+        lives--;
+        updateStats();
+
+        if (lives <= 0) {
+          gameOver();
+          return;
+        }
+      }
+    }
+
+    anim = requestAnimationFrame(loop);
+  }
+
+  startBtn.onclick = function () {
+    reset();
+    running = true;
+    createWord();
+    input.focus();
+    anim = requestAnimationFrame(loop);
+  };
+
+  pauseBtn.onclick = function () {
+    if (!running) return;
+    paused = !paused;
+    pauseBtn.textContent = paused ? '재개' : '일시정지';
+    if (!paused) {
+      last = 0;
+      anim = requestAnimationFrame(loop);
+      input.focus();
+    }
+  };
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handle();
+    }
+  });
+
+  updateStats();
+</script>
+</body>
+</html>
